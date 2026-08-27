@@ -212,7 +212,7 @@ const STATUSES = [
   { key:'doing', label:'En curso' },
   { key:'done', label:'Hecho' }
 ];
-const TYPES = ['Estudiar','Entregable','Práctica','Repaso'];
+const TYPES = ['Estudiar','Entregas','Práctica','Repaso'];
 const PRIORITIES = [{k:'alta',l:'Alta'},{k:'media',l:'Media'},{k:'baja',l:'Baja'}];
 const PALETTE = ['#C9A24B','#8C7AE6','#4FA187','#E0A64E','#5FB0C9','#E2645C','#6E9A73','#A98CE6'];
 const STORAGE_KEY = 'sprints-board-v3';
@@ -612,7 +612,7 @@ function renderExam(boardEl, sprint){
   form.className = 'new-task';
   const input = document.createElement('input');
   input.type = 'text';
-  input.placeholder = 'Tema o contenido a controlar antes del examen';
+  input.placeholder = 'Tema o contenido a dominar antes del examen';
   const btn = document.createElement('button');
   btn.textContent = 'Añadir';
   const addItem = async ()=>{
@@ -690,7 +690,7 @@ function renderOverview(boardEl){
       const empty = document.createElement('div');
       empty.className = 'empty';
       empty.style.padding = '18px';
-      empty.textContent = 'Nada por aquí, bien.';
+      empty.textContent = 'Empty';
       sec.appendChild(empty);
     } else {
       const list = document.createElement('div');
@@ -746,7 +746,7 @@ function renderOverview(boardEl){
 
   section('Tareas atrasadas', overdue, taskRow);
   section('Próximos 7 días', upcoming, taskRow);
-  section('Prioridad alta pendiente', highPriority, taskRow);
+  section('Prioridad alta - pendiente', highPriority, taskRow);
 }
 
 function render(){
@@ -796,4 +796,4 @@ document.getElementById('import-file').addEventListener('change', function(){
 load();
 </script>
 </body>
-</html>
+</html> 
