@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprints — Curso 2026/27</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#16151A;--surface:#1C1B21;--surface-2:#201F26;--card:#242329;
+    --border:#34323B;--border-soft:#2A2930;--text:#EDEBF0;--text-soft:#9C99A6;--text-faint:#6E6B78;
+    --gold:#C9A24B;--gold-tint:rgba(201,162,75,0.14);
+    --violet:#8C7AE6;--violet-tint:rgba(140,122,230,0.16);
+    --new:#7C8798;--new-tint:rgba(124,135,152,0.15);
+    --doing:#E0A64E;--doing-tint:rgba(224,166,78,0.15);
+    --done:#4FA187;--done-tint:rgba(79,161,135,0.15);
+    --danger:#E2645C;--pri-high:#E2645C;--pri-med:#E0A64E;--pri-low:#6E9A73;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;padding:32px 24px 64px;}
+  .wrap{max-width:1120px;margin:0 auto;}
+  header{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:24px;}
+  .title-row{display:flex;align-items:baseline;gap:14px;}
+  h1{font-family:'Fraunces',serif;font-weight:600;font-size:30px;margin:0;letter-spacing:-0.01em;}
+  .sub{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--text-faint);}
+  .header-actions{display:flex;gap:8px;}
+  .ghost-btn{
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;padding:6px 12px;
+    background:none;border:1px solid var(--border);color:var(--text-soft);border-radius:6px;cursor:pointer;
+  }
+  .ghost-btn:hover{border-color:var(--gold);color:var(--gold);}
+
+  .folders{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;align-items:flex-end;}
+  .overview-tab{
+    font-size:13.5px;padding:8px 14px;background:var(--surface);color:var(--violet);
+    border:1px solid var(--border-soft);border-radius:8px 8px 0 0;cursor:pointer;font-weight:500;
+  }
+  .overview-tab.active{background:var(--surface-2);border-bottom:2px solid var(--violet);}
+  .folder-tab{
+    font-size:13.5px;padding:8px 12px 8px 10px;background:var(--surface);color:var(--text-soft);
+    border:1px solid var(--border-soft);border-radius:8px 8px 0 0;cursor:pointer;
+    display:flex;align-items:center;gap:8px;max-width:200px;
+  }
+  .folder-tab span.name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .folder-tab.active{background:var(--surface-2);color:var(--text);font-weight:500;border-bottom:2px solid var(--gold);}
+  .folder-tab .del{opacity:0.4;font-size:13px;}
+  .folder-tab .del:hover{opacity:1;color:var(--danger);}
+  .dot-label{display:flex;align-items:center;cursor:pointer;}
+  .dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+  .dot-input{width:0;height:0;opacity:0;position:absolute;}
+  .add-folder{
+    font-size:13.5px;padding:8px 14px;background:transparent;color:var(--text-faint);
+    border:1px dashed var(--border);border-radius:8px 8px 0 0;cursor:pointer;
+  }
+  .add-folder:hover{color:var(--gold);border-color:var(--gold);}
+
+  .shell{background:var(--surface-2);border:1px solid var(--border-soft);border-radius:0 12px 12px 12px;padding:22px;min-height:440px;}
+  .empty{font-family:'IBM Plex Mono',monospace;font-size:13.5px;color:var(--text-faint);text-align:center;padding:70px 20px;}
+
+  .board-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:18px;}
+  .board-name{font-family:'Fraunces',serif;font-weight:600;font-size:20px;cursor:pointer;}
+  .exam-date-row{display:flex;align-items:center;gap:8px;}
+  .exam-date-row input[type="date"]{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;background:var(--card);
+    border:1px solid var(--border);color:var(--text-soft);border-radius:6px;padding:5px 8px;
+  }
+  .countdown{font-family:'IBM Plex Mono',monospace;font-size:11.5px;padding:4px 10px;border-radius:20px;background:var(--gold-tint);color:var(--gold);}
+  .countdown.soon{background:rgba(226,100,92,0.15);color:var(--danger);}
+
+  .tabs{display:flex;gap:4px;margin-bottom:18px;border-bottom:1px solid var(--border-soft);}
+  .tab-btn{
+    font-family:'Inter',sans-serif;font-weight:500;font-size:13.5px;padding:9px 4px;margin-right:20px;
+    background:none;border:none;color:var(--text-faint);cursor:pointer;border-bottom:2px solid transparent;position:relative;top:1px;
+  }
+  .tab-btn.active{color:var(--text);border-bottom-color:var(--gold);}
+
+  .progress-bar{height:5px;border-radius:3px;background:var(--card);overflow:hidden;margin-bottom:20px;}
+  .progress-fill{height:100%;background:var(--done);transition:width 0.25s ease;}
+
+  .new-task{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px;align-items:center;}
+  .new-task input[type="text"]{
+    flex:1;min-width:180px;font-size:14px;padding:9px 12px;border:1px solid var(--border);
+    border-radius:7px;background:var(--card);color:var(--text);
+  }
+  .new-task input[type="text"]::placeholder{color:var(--text-faint);}
+  .new-task select, .new-task input[type="date"]{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;padding:8px 8px;border:1px solid var(--border);
+    border-radius:7px;background:var(--card);color:var(--text-soft);
+  }
+  .new-task input:focus, .new-task select:focus{outline:none;border-color:var(--gold);}
+  .new-task button{
+    font-weight:500;font-size:14px;padding:9px 18px;background:var(--gold);color:#1A1810;
+    border:none;border-radius:7px;cursor:pointer;
+  }
+  .new-task button:hover{background:#D9B15D;}
+
+  .columns{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  .col{min-width:0;border-radius:10px;padding:4px;transition:background 0.15s;}
+  .col.drag-over{background:var(--card);}
+  .col-head{
+    display:flex;align-items:center;justify-content:space-between;font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;text-transform:uppercase;letter-spacing:0.05em;padding:7px 10px;border-radius:6px;margin-bottom:10px;
+  }
+  .col[data-status="nuevo"] .col-head{background:var(--new-tint);color:var(--new);}
+  .col[data-status="doing"] .col-head{background:var(--doing-tint);color:var(--doing);}
+  .col[data-status="done"] .col-head{background:var(--done-tint);color:var(--done);}
+
+  .task-list{display:flex;flex-direction:column;gap:8px;min-height:60px;}
+  .task{background:var(--card);border:1px solid var(--border-soft);border-left:3px solid var(--pri-med);border-radius:8px;padding:11px 12px;cursor:grab;}
+  .task:active{cursor:grabbing;}
+  .task[data-priority="alta"]{border-left-color:var(--pri-high);}
+  .task[data-priority="media"]{border-left-color:var(--pri-med);}
+  .task[data-priority="baja"]{border-left-color:var(--pri-low);}
+  .task-title{font-size:13.5px;line-height:1.4;margin:0 0 8px;word-break:break-word;}
+  .task-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+  .chip{font-family:'IBM Plex Mono',monospace;font-size:10.5px;padding:2px 7px;border-radius:20px;background:var(--violet-tint);color:var(--violet);}
+  .due{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--text-faint);}
+  .due.overdue{color:var(--danger);}
+  .task-row{display:flex;align-items:center;justify-content:space-between;gap:6px;}
+  .move-btns{display:flex;gap:4px;}
+  .move-btns button{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;background:none;border:1px solid var(--border-soft);
+    color:var(--text-soft);border-radius:5px;width:22px;height:22px;cursor:pointer;
+  }
+  .move-btns button:hover{border-color:var(--gold);color:var(--gold);}
+  .move-btns button:disabled{opacity:0.25;cursor:default;}
+  .icon-btn{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-faint);background:none;border:none;cursor:pointer;}
+  .icon-btn:hover{color:var(--gold);}
+  .icon-btn.trash:hover{color:var(--danger);}
+  .notes-area{
+    width:100%;font-family:'Inter',sans-serif;font-size:12.5px;background:var(--surface);
+    border:1px solid var(--border-soft);border-radius:6px;color:var(--text-soft);padding:8px;
+    margin-bottom:8px;resize:vertical;min-height:50px;
+  }
+  .notes-area:focus{outline:none;border-color:var(--gold);}
+
+  .exam-list{display:flex;flex-direction:column;gap:6px;}
+  .exam-item{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border-soft);border-radius:8px;padding:10px 12px;}
+  .exam-item input[type="checkbox"]{width:17px;height:17px;accent-color:var(--done);cursor:pointer;flex-shrink:0;}
+  .exam-item label{flex:1;font-size:13.5px;cursor:pointer;}
+  .exam-item.done label{color:var(--text-faint);text-decoration:line-through;}
+  .exam-item .icon-btn{opacity:0.5;}
+  .exam-item:hover .icon-btn{opacity:1;}
+
+  .ov-section{margin-bottom:26px;}
+  .ov-title{font-family:'Fraunces',serif;font-weight:600;font-size:16px;margin:0 0 10px;}
+  .ov-list{display:flex;flex-direction:column;gap:6px;}
+  .ov-row{
+    display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border-soft);
+    border-radius:8px;padding:9px 12px;cursor:pointer;font-size:13.5px;
+  }
+  .ov-row:hover{border-color:var(--gold);}
+  .ov-row .dot{flex-shrink:0;}
+  .ov-row .ov-folder{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--text-faint);}
+  .ov-row .ov-when{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--text-faint);}
+  .ov-row .ov-when.overdue{color:var(--danger);}
+
+  @media (max-width:760px){.columns{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="title-row">
+      <h1>Sprints</h1>
+      <span class="sub" id="status-line">cargando…</span>
+    </div>
+    <div class="header-actions">
+      <button class="ghost-btn" id="export-btn">Exportar</button>
+      <button class="ghost-btn" id="import-btn">Importar</button>
+      <input type="file" id="import-file" accept="application/json" style="display:none;">
+    </div>
+  </header>
+  <div class="folders" id="folders"></div>
+  <div class="shell"><div id="board"></div></div>
+  <p style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-faint);margin-top:20px;">
+    Enlace privado de este tablero (guárdalo/compártelo tal cual, con todo lo que va después de #):<br>
+    <span id="board-link" style="color:var(--gold);word-break:break-all;"></span>
+  </p>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+<script>
+// ---- PEGA AQUÍ TU CONFIGURACIÓN DE FIREBASE (Paso 4 de la guía) ----
+const firebaseConfig = {
+  apiKey: "TU_API_KEY",
+  databaseURL: "https://TU_PROYECTO-default-rtdb.TU_REGION.firebasedatabase.app",
+  projectId: "TU_PROYECTO"
+};
+// ----------------------------------------------------------------
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+function getBoardId(){
+  let id = window.location.hash.replace('#', '');
+  if(!id){
+    id = Array.from(crypto.getRandomValues(new Uint8Array(15))).map(b => b.toString(36)).join('').slice(0,20);
+    window.location.hash = id;
+  }
+  return id;
+}
+const BOARD_ID = getBoardId();
+const boardRef = db.ref('boards/' + BOARD_ID);
+
+let state = { sprints: [], activeId: null, activeTab: 'board' };
+const expandedNotes = new Set();
+const STATUSES = [
+  { key:'nuevo', label:'Nuevo' },
+  { key:'doing', label:'En curso' },
+  { key:'done', label:'Hecho' }
+];
+const TYPES = ['Estudiar','Entregable','Práctica','Repaso'];
+const PRIORITIES = [{k:'alta',l:'Alta'},{k:'media',l:'Media'},{k:'baja',l:'Baja'}];
+const PALETTE = ['#C9A24B','#8C7AE6','#4FA187','#E0A64E','#5FB0C9','#E2645C','#6E9A73','#A98CE6'];
+const STORAGE_KEY = 'sprints-board-v3';
+
+function uid(){ return Math.random().toString(36).slice(2,9); }
+function statusIdx(k){ return STATUSES.findIndex(s => s.key === k); }
+function nextColor(){ return PALETTE[state.sprints.length % PALETTE.length]; }
+
+let applyingRemote = false;
+
+function load(){
+  document.getElementById('board-link').textContent = window.location.href;
+  boardRef.on('value', snapshot => {
+    const remote = snapshot.val();
+    if(remote){
+      applyingRemote = true;
+      state = remote;
+    } else {
+      const id = uid();
+      applyingRemote = true;
+      state = { sprints: [{ id, name:'Sprint 1', color: PALETTE[0], examDate:'', tasks: [], examItems: [] }], activeId: id, activeTab:'board' };
+      save(true);
+    }
+    state.sprints = state.sprints || [];
+    state.sprints.forEach(s => { if(!s.color) s.color = nextColor(); if(!('examDate' in s)) s.examDate=''; s.tasks = s.tasks || []; s.examItems = s.examItems || []; });
+    if(!state.activeId && state.sprints.length) state.activeId = state.sprints[0].id;
+    if(!state.activeTab) state.activeTab = 'board';
+    render();
+    applyingRemote = false;
+  });
+}
+
+async function save(silent){
+  if(applyingRemote) return;
+  try{
+    await boardRef.set(state);
+    if(!silent){
+      const s = document.getElementById('status-line');
+      s.textContent = 'sincronizado';
+      setTimeout(()=>{ if(s) s.textContent = countLabel(); }, 800);
+    }
+  }catch(e){
+    document.getElementById('status-line').textContent = 'error al sincronizar';
+  }
+}
+function countLabel(){ return state.sprints.length + ' carpeta' + (state.sprints.length===1?'':'s'); }
+function activeSprint(){ return state.sprints.find(s => s.id === state.activeId) || null; }
+
+function daysUntil(dateStr){
+  if(!dateStr) return null;
+  const target = new Date(dateStr + 'T00:00:00');
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  return Math.round((target - today) / 86400000);
+}
+
+function renderFolders(){
+  const el = document.getElementById('folders');
+  el.innerHTML = '';
+
+  const overview = document.createElement('div');
+  overview.className = 'overview-tab' + (state.activeId === '__overview__' ? ' active' : '');
+  overview.textContent = 'Resumen';
+  overview.addEventListener('click', ()=>{ state.activeId = '__overview__'; render(); });
+  el.appendChild(overview);
+
+  state.sprints.forEach(s => {
+    const tab = document.createElement('div');
+    tab.className = 'folder-tab' + (s.id === state.activeId ? ' active' : '');
+
+    const dotLabel = document.createElement('label');
+    dotLabel.className = 'dot-label';
+    const dot = document.createElement('span');
+    dot.className = 'dot';
+    dot.style.background = s.color;
+    const colorInput = document.createElement('input');
+    colorInput.type = 'color';
+    colorInput.className = 'dot-input';
+    colorInput.value = s.color;
+    colorInput.addEventListener('click', ev => ev.stopPropagation());
+    colorInput.addEventListener('input', async ()=>{ s.color = colorInput.value; dot.style.background = s.color; await save(true); });
+    colorInput.addEventListener('change', render);
+    dotLabel.appendChild(dot);
+    dotLabel.appendChild(colorInput);
+    tab.appendChild(dotLabel);
+
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'name';
+    nameSpan.textContent = s.name;
+    tab.appendChild(nameSpan);
+
+    const del = document.createElement('span');
+    del.className = 'del';
+    del.textContent = '✕';
+    del.addEventListener('click', async ev => {
+      ev.stopPropagation();
+      if(!confirm('¿Eliminar la carpeta "' + s.name + '"?')) return;
+      state.sprints = state.sprints.filter(x => x.id !== s.id);
+      if(state.activeId === s.id) state.activeId = state.sprints.length ? state.sprints[0].id : null;
+      await save(); render();
+    });
+    tab.appendChild(del);
+
+    const moveIdx = state.sprints.findIndex(x => x.id === s.id);
+    const moveLeft = document.createElement('span');
+    moveLeft.className = 'del';
+    moveLeft.textContent = '‹';
+    moveLeft.title = 'Mover a la izquierda';
+    if(moveIdx === 0) moveLeft.style.opacity = '0.2';
+    moveLeft.addEventListener('click', async ev => {
+      ev.stopPropagation();
+      if(moveIdx === 0) return;
+      const arr = state.sprints;
+      [arr[moveIdx-1], arr[moveIdx]] = [arr[moveIdx], arr[moveIdx-1]];
+      await save(); render();
+    });
+    tab.appendChild(moveLeft);
+    const moveRight = document.createElement('span');
+    moveRight.className = 'del';
+    moveRight.textContent = '›';
+    moveRight.title = 'Mover a la derecha';
+    if(moveIdx === state.sprints.length - 1) moveRight.style.opacity = '0.2';
+    moveRight.addEventListener('click', async ev => {
+      ev.stopPropagation();
+      if(moveIdx === state.sprints.length - 1) return;
+      const arr = state.sprints;
+      [arr[moveIdx+1], arr[moveIdx]] = [arr[moveIdx], arr[moveIdx+1]];
+      await save(); render();
+    });
+    tab.appendChild(moveRight);
+
+    tab.draggable = true;
+    tab.addEventListener('dragstart', e => { e.dataTransfer.setData('folder-id', s.id); tab.style.opacity = '0.4'; });
+    tab.addEventListener('dragend', ()=> { tab.style.opacity = '1'; });
+    tab.addEventListener('dragover', e => { e.preventDefault(); });
+    tab.addEventListener('drop', async e => {
+      e.preventDefault();
+      const draggedId = e.dataTransfer.getData('folder-id');
+      if(!draggedId || draggedId === s.id) return;
+      const dragged = state.sprints.find(x => x.id === draggedId);
+      if(!dragged) return;
+      state.sprints = state.sprints.filter(x => x.id !== draggedId);
+      const targetIndex = state.sprints.findIndex(x => x.id === s.id);
+      state.sprints.splice(targetIndex, 0, dragged);
+      await save(); render();
+    });
+    tab.addEventListener('click', ()=>{ state.activeId = s.id; state.activeTab='board'; render(); });
+    el.appendChild(tab);
+  });
+
+  const add = document.createElement('div');
+  add.className = 'add-folder';
+  add.textContent = '+ Nueva carpeta';
+  add.addEventListener('click', async ()=>{
+    const name = prompt('Nombre de la carpeta (asignatura, sprint...):');
+    if(!name || !name.trim()) return;
+    const id = uid();
+    state.sprints.push({ id, name:name.trim(), color: nextColor(), examDate:'', tasks:[], examItems:[] });
+    state.activeId = id; state.activeTab='board';
+    await save(); render();
+  });
+  el.appendChild(add);
+}
+
+function renderBoard(){
+  const boardEl = document.getElementById('board');
+  boardEl.innerHTML = '';
+
+  if(state.activeId === '__overview__'){ renderOverview(boardEl); return; }
+
+  const sprint = activeSprint();
+  if(!sprint){ boardEl.innerHTML = '<div class="empty">Crea una carpeta para empezar.</div>'; return; }
+
+  const top = document.createElement('div');
+  top.className = 'board-top';
+  const name = document.createElement('div');
+  name.className = 'board-name';
+  name.textContent = sprint.name;
+  name.title = 'Clic para renombrar';
+  name.addEventListener('click', async ()=>{
+    const val = prompt('Nuevo nombre:', sprint.name);
+    if(val && val.trim()){ sprint.name = val.trim(); await save(); render(); }
+  });
+  top.appendChild(name);
+
+  const dateRow = document.createElement('div');
+  dateRow.className = 'exam-date-row';
+  const dateInput = document.createElement('input');
+  dateInput.type = 'date';
+  dateInput.value = sprint.examDate || '';
+  dateInput.title = 'Fecha de examen';
+  dateInput.addEventListener('change', async ()=>{ sprint.examDate = dateInput.value; await save(); render(); });
+  dateRow.appendChild(dateInput);
+  const d = daysUntil(sprint.examDate);
+  if(d !== null){
+    const badge = document.createElement('span');
+    badge.className = 'countdown' + (d <= 3 ? ' soon' : '');
+    badge.textContent = d > 0 ? ('examen en ' + d + ' día' + (d===1?'':'s')) : (d === 0 ? 'examen es hoy' : 'examen ya pasó');
+    dateRow.appendChild(badge);
+  }
+  top.appendChild(dateRow);
+  boardEl.appendChild(top);
+
+  const tabs = document.createElement('div');
+  tabs.className = 'tabs';
+  const t1 = document.createElement('button');
+  t1.className = 'tab-btn' + (state.activeTab==='board' ? ' active' : '');
+  t1.textContent = 'Tablero';
+  t1.addEventListener('click', ()=>{ state.activeTab='board'; render(); });
+  const t2 = document.createElement('button');
+  t2.className = 'tab-btn' + (state.activeTab==='exam' ? ' active' : '');
+  t2.textContent = 'Contenidos examen';
+  t2.addEventListener('click', ()=>{ state.activeTab='exam'; render(); });
+  tabs.appendChild(t1); tabs.appendChild(t2);
+  boardEl.appendChild(tabs);
+
+  if(state.activeTab === 'board') renderKanban(boardEl, sprint);
+  else renderExam(boardEl, sprint);
+}
+
+function renderKanban(boardEl, sprint){
+  const total = sprint.tasks.length;
+  const doneCount = sprint.tasks.filter(t => t.status === 'done').length;
+  const pct = total ? Math.round((doneCount/total)*100) : 0;
+  const pbar = document.createElement('div');
+  pbar.className = 'progress-bar';
+  pbar.innerHTML = '<div class="progress-fill" style="width:' + pct + '%"></div>';
+  boardEl.appendChild(pbar);
+
+  const form = document.createElement('div');
+  form.className = 'new-task';
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.placeholder = 'Nueva tarea';
+  const typeSel = document.createElement('select');
+  TYPES.forEach(t => { const o=document.createElement('option'); o.value=t; o.textContent=t; typeSel.appendChild(o); });
+  const priSel = document.createElement('select');
+  PRIORITIES.forEach(p => { const o=document.createElement('option'); o.value=p.k; o.textContent=p.l; if(p.k==='media') o.selected=true; priSel.appendChild(o); });
+  const dueInput = document.createElement('input');
+  dueInput.type = 'date';
+  const btn = document.createElement('button');
+  btn.textContent = 'Añadir';
+  const addTask = async ()=>{
+    const val = input.value.trim();
+    if(!val) return;
+    sprint.tasks.push({ id: uid(), title: val, type: typeSel.value, priority: priSel.value, due: dueInput.value || '', status:'nuevo', notes:'' });
+    input.value=''; dueInput.value='';
+    await save(); render();
+  };
+  btn.addEventListener('click', addTask);
+  input.addEventListener('keydown', e => { if(e.key==='Enter') addTask(); });
+  form.appendChild(input); form.appendChild(typeSel); form.appendChild(priSel); form.appendChild(dueInput); form.appendChild(btn);
+  boardEl.appendChild(form);
+
+  const cols = document.createElement('div');
+  cols.className = 'columns';
+
+  STATUSES.forEach(st => {
+    const col = document.createElement('div');
+    col.className = 'col';
+    col.setAttribute('data-status', st.key);
+    col.addEventListener('dragover', e => { e.preventDefault(); col.classList.add('drag-over'); });
+    col.addEventListener('dragleave', ()=> col.classList.remove('drag-over'));
+    col.addEventListener('drop', async e => {
+      e.preventDefault();
+      col.classList.remove('drag-over');
+      const taskId = e.dataTransfer.getData('text/plain');
+      const task = sprint.tasks.find(t => t.id === taskId);
+      if(task){
+        sprint.tasks = sprint.tasks.filter(t => t.id !== taskId);
+        task.status = st.key;
+        sprint.tasks.push(task);
+        await save(); render();
+      }
+    });
+
+    const head = document.createElement('div');
+    head.className = 'col-head';
+    const count = sprint.tasks.filter(t => t.status === st.key).length;
+    head.innerHTML = '<span>' + st.label + '</span><span>' + count + '</span>';
+    col.appendChild(head);
+
+    const list = document.createElement('div');
+    list.className = 'task-list';
+
+    sprint.tasks.filter(t => t.status === st.key).forEach(task => {
+      const card = document.createElement('div');
+      card.className = 'task';
+      card.setAttribute('data-priority', task.priority || 'media');
+      card.draggable = true;
+      card.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', task.id); card.style.opacity = '0.4'; });
+      card.addEventListener('dragend', ()=> { card.style.opacity = '1'; });
+      card.addEventListener('dragover', e => { e.preventDefault(); e.stopPropagation(); });
+      card.addEventListener('drop', async e => {
+        e.preventDefault();
+        e.stopPropagation();
+        const draggedId = e.dataTransfer.getData('text/plain');
+        if(!draggedId || draggedId === task.id) return;
+        const draggedTask = sprint.tasks.find(t => t.id === draggedId);
+        if(!draggedTask) return;
+        sprint.tasks = sprint.tasks.filter(t => t.id !== draggedId);
+        const targetIndex = sprint.tasks.findIndex(t => t.id === task.id);
+        const rect = card.getBoundingClientRect();
+        const before = (e.clientY - rect.top) < rect.height / 2;
+        draggedTask.status = st.key;
+        sprint.tasks.splice(before ? targetIndex : targetIndex + 1, 0, draggedTask);
+        await save(); render();
+      });
+
+      const title = document.createElement('p');
+      title.className = 'task-title';
+      title.textContent = task.title;
+      card.appendChild(title);
+
+      const meta = document.createElement('div');
+      meta.className = 'task-meta';
+      const chip = document.createElement('span');
+      chip.className = 'chip';
+      chip.textContent = task.type || 'Estudiar';
+      meta.appendChild(chip);
+      if(task.due){
+        const due = document.createElement('span');
+        const overdue = daysUntil(task.due) !== null && daysUntil(task.due) < 0 && task.status !== 'done';
+        due.className = 'due' + (overdue ? ' overdue' : '');
+        due.textContent = task.due;
+        meta.appendChild(due);
+      }
+      card.appendChild(meta);
+
+      if(expandedNotes.has(task.id)){
+        const ta = document.createElement('textarea');
+        ta.className = 'notes-area';
+        ta.placeholder = 'Notas, dudas, enlaces...';
+        ta.value = task.notes || '';
+        ta.addEventListener('input', ()=>{ task.notes = ta.value; });
+        ta.addEventListener('blur', async ()=>{ await save(true); });
+        card.appendChild(ta);
+      }
+
+      const row = document.createElement('div');
+      row.className = 'task-row';
+      const moveBtns = document.createElement('div');
+      moveBtns.className = 'move-btns';
+      const idx = statusIdx(task.status);
+      const back = document.createElement('button');
+      back.textContent = '‹';
+      back.disabled = idx === 0;
+      back.addEventListener('click', async ()=>{ task.status = STATUSES[idx-1].key; await save(); render(); });
+      const fwd = document.createElement('button');
+      fwd.textContent = '›';
+      fwd.disabled = idx === STATUSES.length-1;
+      fwd.addEventListener('click', async ()=>{ task.status = STATUSES[idx+1].key; await save(); render(); });
+      moveBtns.appendChild(back); moveBtns.appendChild(fwd);
+      row.appendChild(moveBtns);
+
+      const rightBtns = document.createElement('div');
+      const notesBtn = document.createElement('button');
+      notesBtn.className = 'icon-btn';
+      notesBtn.textContent = expandedNotes.has(task.id) ? 'ocultar notas' : (task.notes ? 'ver notas' : 'notas');
+      notesBtn.addEventListener('click', ()=>{
+        if(expandedNotes.has(task.id)) expandedNotes.delete(task.id); else expandedNotes.add(task.id);
+        render();
+      });
+      rightBtns.appendChild(notesBtn);
+      const trash = document.createElement('button');
+      trash.className = 'icon-btn trash';
+      trash.textContent = 'eliminar';
+      trash.style.marginLeft = '8px';
+      trash.addEventListener('click', async ()=>{
+        sprint.tasks = sprint.tasks.filter(t => t.id !== task.id);
+        await save(); render();
+      });
+      rightBtns.appendChild(trash);
+      row.appendChild(rightBtns);
+
+      card.appendChild(row);
+      list.appendChild(card);
+    });
+
+    col.appendChild(list);
+    cols.appendChild(col);
+  });
+
+  boardEl.appendChild(cols);
+}
+
+function renderExam(boardEl, sprint){
+  const total = sprint.examItems.length;
+  const doneCount = sprint.examItems.filter(i => i.done).length;
+  const pct = total ? Math.round((doneCount/total)*100) : 0;
+  const pbar = document.createElement('div');
+  pbar.className = 'progress-bar';
+  pbar.innerHTML = '<div class="progress-fill" style="width:' + pct + '%"></div>';
+  boardEl.appendChild(pbar);
+
+  const form = document.createElement('div');
+  form.className = 'new-task';
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.placeholder = 'Tema o contenido a controlar antes del examen';
+  const btn = document.createElement('button');
+  btn.textContent = 'Añadir';
+  const addItem = async ()=>{
+    const val = input.value.trim();
+    if(!val) return;
+    sprint.examItems.push({ id: uid(), text: val, done:false });
+    input.value = '';
+    await save(); render();
+  };
+  btn.addEventListener('click', addItem);
+  input.addEventListener('keydown', e => { if(e.key==='Enter') addItem(); });
+  form.appendChild(input); form.appendChild(btn);
+  boardEl.appendChild(form);
+
+  if(!sprint.examItems.length){
+    const empty = document.createElement('div');
+    empty.className = 'empty';
+    empty.textContent = 'Añade los temas o contenidos que necesitas dominar antes del examen.';
+    boardEl.appendChild(empty);
+    return;
+  }
+
+  const list = document.createElement('div');
+  list.className = 'exam-list';
+  sprint.examItems.forEach(item => {
+    const row = document.createElement('div');
+    row.className = 'exam-item' + (item.done ? ' done' : '');
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.checked = item.done;
+    const cbId = 'ex-' + item.id;
+    cb.id = cbId;
+    cb.addEventListener('change', async ()=>{ item.done = cb.checked; await save(); render(); });
+    const label = document.createElement('label');
+    label.setAttribute('for', cbId);
+    label.textContent = item.text;
+    const trash = document.createElement('button');
+    trash.className = 'icon-btn trash';
+    trash.textContent = 'eliminar';
+    trash.addEventListener('click', async ()=>{
+      sprint.examItems = sprint.examItems.filter(i => i.id !== item.id);
+      await save(); render();
+    });
+    row.appendChild(cb); row.appendChild(label); row.appendChild(trash);
+    list.appendChild(row);
+  });
+  boardEl.appendChild(list);
+}
+
+function renderOverview(boardEl){
+  const goTo = (sprintId) => { state.activeId = sprintId; state.activeTab = 'board'; render(); };
+
+  const upcomingExams = state.sprints
+    .filter(s => s.examDate)
+    .map(s => ({ s, d: daysUntil(s.examDate) }))
+    .filter(x => x.d !== null && x.d >= 0)
+    .sort((a,b) => a.d - b.d);
+
+  const allTasks = [];
+  state.sprints.forEach(s => s.tasks.forEach(t => { if(t.status !== 'done') allTasks.push({ s, t }); }));
+
+  const overdue = allTasks.filter(x => x.t.due && daysUntil(x.t.due) < 0).sort((a,b)=> daysUntil(a.t.due)-daysUntil(b.t.due));
+  const upcoming = allTasks.filter(x => x.t.due && daysUntil(x.t.due) >= 0 && daysUntil(x.t.due) <= 7).sort((a,b)=> daysUntil(a.t.due)-daysUntil(b.t.due));
+  const shownIds = new Set([...overdue, ...upcoming].map(x => x.t.id));
+  const highPriority = allTasks.filter(x => x.t.priority === 'alta' && !shownIds.has(x.t.id));
+
+  function section(title, items, renderRow){
+    const sec = document.createElement('div');
+    sec.className = 'ov-section';
+    const h = document.createElement('h3');
+    h.className = 'ov-title';
+    h.textContent = title;
+    sec.appendChild(h);
+    if(!items.length){
+      const empty = document.createElement('div');
+      empty.className = 'empty';
+      empty.style.padding = '18px';
+      empty.textContent = 'Nada por aquí, bien.';
+      sec.appendChild(empty);
+    } else {
+      const list = document.createElement('div');
+      list.className = 'ov-list';
+      items.forEach(item => list.appendChild(renderRow(item)));
+      sec.appendChild(list);
+    }
+    boardEl.appendChild(sec);
+  }
+
+  function taskRow(x){
+    const row = document.createElement('div');
+    row.className = 'ov-row';
+    row.addEventListener('click', ()=> goTo(x.s.id));
+    const dot = document.createElement('span');
+    dot.className = 'dot';
+    dot.style.background = x.s.color;
+    row.appendChild(dot);
+    const title = document.createElement('span');
+    title.textContent = x.t.title;
+    row.appendChild(title);
+    const folder = document.createElement('span');
+    folder.className = 'ov-folder';
+    folder.textContent = x.s.name;
+    row.appendChild(folder);
+    if(x.t.due){
+      const when = document.createElement('span');
+      const d = daysUntil(x.t.due);
+      when.className = 'ov-when' + (d < 0 ? ' overdue' : '');
+      when.textContent = d < 0 ? (Math.abs(d) + ' días de retraso') : (d === 0 ? 'hoy' : ('en ' + d + ' días'));
+      row.appendChild(when);
+    }
+    return row;
+  }
+
+  section('Exámenes próximos', upcomingExams, x => {
+    const row = document.createElement('div');
+    row.className = 'ov-row';
+    row.addEventListener('click', ()=> goTo(x.s.id));
+    const dot = document.createElement('span');
+    dot.className = 'dot';
+    dot.style.background = x.s.color;
+    row.appendChild(dot);
+    const title = document.createElement('span');
+    title.textContent = x.s.name;
+    row.appendChild(title);
+    const when = document.createElement('span');
+    when.className = 'ov-when' + (x.d <= 3 ? ' overdue' : '');
+    when.textContent = x.d === 0 ? 'hoy' : ('en ' + x.d + ' días');
+    row.appendChild(when);
+    return row;
+  });
+
+  section('Tareas atrasadas', overdue, taskRow);
+  section('Próximos 7 días', upcoming, taskRow);
+  section('Prioridad alta pendiente', highPriority, taskRow);
+}
+
+function render(){
+  document.getElementById('status-line').textContent = countLabel();
+  renderFolders();
+  renderBoard();
+}
+
+document.getElementById('export-btn').addEventListener('click', ()=>{
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type:'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'sprints-backup.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById('import-btn').addEventListener('click', ()=>{
+  document.getElementById('import-file').click();
+});
+document.getElementById('import-file').addEventListener('change', function(){
+  const file = this.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = async ()=>{
+    try{
+      const parsed = JSON.parse(reader.result);
+      if(!parsed || !Array.isArray(parsed.sprints)) throw new Error('formato inválido');
+      if(!confirm('Esto reemplazará todos los datos actuales por los del archivo importado. ¿Continuar?')) return;
+      state = parsed;
+      if(!state.activeId && state.sprints.length) state.activeId = state.sprints[0].id;
+      if(!state.activeTab) state.activeTab = 'board';
+      state.sprints.forEach(s => { if(!s.color) s.color = nextColor(); });
+      await save();
+      render();
+    }catch(e){
+      alert('No se ha podido importar el archivo: ' + e.message);
+    }
+    this.value = '';
+  };
+  reader.readAsText(file);
+});
+
+load();
+</script>
+</body>
+</html>
