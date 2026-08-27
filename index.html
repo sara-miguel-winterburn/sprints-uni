@@ -19,8 +19,9 @@
     --danger:#E2645C;--pri-high:#E2645C;--pri-med:#E0A64E;--pri-low:#6E9A73;
   }
   *{box-sizing:border-box;}
-  body{margin:0;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;padding:32px 24px 64px;}
-  .wrap{max-width:1120px;margin:0 auto;}
+  html{overflow-x:hidden;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;padding:32px 24px 64px;overflow-x:hidden;}
+  .wrap{max-width:1120px;margin:0 auto;width:100%;}
   header{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:24px;}
   .title-row{display:flex;align-items:baseline;gap:14px;}
   h1{font-family:'Fraunces',serif;font-weight:600;font-size:30px;margin:0;letter-spacing:-0.01em;}
@@ -157,7 +158,21 @@
   .ov-row .ov-when{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--text-faint);}
   .ov-row .ov-when.overdue{color:var(--danger);}
 
-  @media (max-width:760px){.columns{grid-template-columns:1fr;}}
+  @media (max-width:900px){.columns{grid-template-columns:1fr 1fr;}}
+  @media (max-width:600px){
+    .columns{grid-template-columns:1fr;}
+    body{padding:20px 14px 48px;}
+    h1{font-size:24px;}
+    .board-name{font-size:18px;}
+    .shell{padding:16px;}
+    .new-task input[type="text"]{min-width:120px;}
+    .new-task select, .new-task input[type="date"]{flex:1;min-width:90px;}
+    .header-actions{width:100%;justify-content:flex-start;}
+  }
+  @media (max-width:380px){
+    .folder-tab{max-width:130px;padding:7px 8px 7px 8px;}
+    h1{font-size:21px;}
+  }
 </style>
 </head>
 <body>
